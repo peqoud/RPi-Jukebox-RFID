@@ -1,6 +1,10 @@
 # RPi-Jukebox-RFID
 A jukebox for the Raspberry Pi, playing local audio files, playlists or even web streams triggered by RFID cards. All plug and play via USB, no soldering iron needed. Update: if you must, it now also features a howto for adding GPIO buttons controls.
 
+* **Important update information from version < 0.9.3** Please see [`INSTALL.md`](docs/INSTALL.md) for details (2018-04-16)
+
+---
+
 <a href="https://youtu.be/7GI0VdPehQI" target="_blank"><img src="docs/img/iFun-YouTube.jpg" alt="Prototype of the RFID jukebox" width="800" height="450" border="1" /></a>
 
 *See the jukebox code in action, watch this video and read the blog post from [iphone-ticker.de](https://www.iphone-ticker.de/wochenend-projekt-kontaktlose-musikbox-fuer-kinder-123063/)*
@@ -37,13 +41,13 @@ The web app runs on any device and is mobile optimised. It provides:
 
 ## Installation
 
-Follow the instructions in the [`INSTALL.md`](docs/INSTALL.md) file in the `docs` folder.
-
-Then walk through the configuration of the RPi here: [`CONFIGURE.md`](docs/CONFIGURE.md)
-
-Once everything is set up and configured, read the manual to register cards and add audio: [`MANUAL.md`](docs/MANUAL.md)
+* Follow the instructions in the [`INSTALL.md`](docs/INSTALL.md) file in the `docs` folder. (experts might take a look at the [install script for Jessie](https://github.com/MiczFlor/RPi-Jukebox-RFID/blob/master/scripts/installscripts/jessie-install-default-01.sh))
+* Then walk through the configuration of the RPi here: [`CONFIGURE.md`](docs/CONFIGURE.md)
+* Once everything is set up and configured, read the manual to register cards and add audio: [`MANUAL.md`](docs/MANUAL.md)
 
 Adding push buttons to control volume, skipping tracks, pause, play: read the [GPIO buttons installation guide](docs/GPIO-BUTTONS.md).
+
+*A German version for the installation ... hier ist eine etwas überholte [deutsche Version der Installationsdoku für Jessie](http://docplayer.org/68280452-Anleitung-jukebox-kinder-https-github-com-miczflor-rpi-jukebox-rfid-mit-buttons-und-hifiberry-miniamp.html) von [hailogugo](https://forum-raspberrypi.de/user/51824-hailogugo/)* 
 
 ## Manual
 
@@ -57,7 +61,12 @@ In [`MANUAL.md`](docs/MANUAL.md) you will learn:
 
 ## Troubleshooting
 
-* [I am moving, how do I get the jukebox into my new WiFi network?](docs/MANUAL.md#changewifisettings)
+There is a growing section of [troubleshooting](docs/MANUAL.md#faq) including:
+
+* How do I get the jukebox into a new WiFi network?
+* The `amixer` command requires different device name, not `PCM`
+* Script `daemon_rfid_reader.py` only works via SSH not by RFID cards
+* Script daemon is closing down unexpectedly
 
 ## Acknowledgments
 
