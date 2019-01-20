@@ -1,20 +1,22 @@
 #!/usr/bin/python
-# Currently only work in python 2.7 - .send works with str here
+# Debug Version for jukebox_control.py, which is usable on the real hardware
+# this file is only for simulation on any pc
 
 # Pages https://forum-raspberrypi.de/forum/thread/13144-projekt-jukebox4kids-jukebox-fuer-kinder/?postID=312257#post312257
 # needs: https://nclib.readthedocs.io/en/latest/
 # pip install nclib
+
 # Depends on libs:
 # nclib    - https://nclib.readthedocs.io/en/latest/  - pip install nclib
 # gpiozero - https://gpiozero.readthedocs.io/en/stable/installing.html
-# KY040    - git link to my repo
+# KY040    - git link to my repo 
 
 
 # for controlling VLC over rc, see:
 # https://n0tablog.wordpress.com/2009/02/09/controlling-vlc-via-rc-remote-control-interface-using-a-unix-domain-socket-and-no-programming/
 
-from gpiozero import Button
-from gpiozero import LED
+# from gpiozero import Button
+# from gpiozero import LED
 import subprocess
 import os , signal
 from subprocess import check_call
@@ -27,11 +29,10 @@ import nclib
 from thread import start_new_thread
 # Regex for VLC
 import re
-import KY040.ky040.KY040 import KY040
-
+# from KY040 import KY040
 
 # setup Basic logging to file
-logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%I:%M:%S', level=logging.DEBUG, filename='./jukebox_control.log', filemode='w')
+logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%I:%M:%S', level=logging.DEBUG, filename='./jukebox_control.log', filemode='w')  # change filemode to 'a' for an continues logfile
 # Logging for console
 console = logging.StreamHandler()
 console.setLevel(logging.DEBUG)
@@ -61,7 +62,6 @@ def nc_send(command, recv=False):
         # delete nc
         nc = None
 
-
 # Handler if the process is killed (by OS during shutdown most probably)
 def sigterm_handler(signal, frame):
    global thread_end_requested
@@ -70,18 +70,16 @@ def sigterm_handler(signal, frame):
    # Stop the player
    if nc != None:
       nc_send('stop')
-      nc.close()  
+      nc.close()
    logging.info("VLC Stop Play")
    logging.info("Switch Off Relais")
    # Kill vlc subprocess
    check_kill_process("vlc")
    logging.info("Exit Daemon RFID and VLC Killed")
-   
    # Switch of relais
-   led.off()
+   # led.off()
    # Wait 1 seconds
    time.sleep(1)
-   
    logging.info("Exit Task")
    logging.shutdown()
    # Exit Task
@@ -93,14 +91,17 @@ def def_shutdown():
    thread_end_requested = True
    logging.info("Switch Off Relais")
    # Switch of relais
-   led.off()
+   # led.off()
    nc_send('stop')
-   nc.close()  
+   nc.close()
    # Wait 1 seconds
    time.sleep(1)
    logging.info("Calling PowerOff")
    logging.shutdown()
-   check_call(['sudo', 'poweroff'])
+   # check_call(['sudo', 'poweroff'])
+   # Exit Task
+   sys.exit(0)
+    
     
 def clear_playlist():
    nc_send('clear')
@@ -139,7 +140,7 @@ def def_pause():
     shutdown_timer = DEFAULT_SHUTDOWN_TIME_S
     playing = False
     # toggle to play handler
-    play_pause.when_pressed = def_play
+    # play_pause.when_pressed = def_play
 #end def_pause
 
 def def_play():
@@ -150,7 +151,7 @@ def def_play():
     playing = True
     shutdown_timer = DEFAULT_SHUTDOWN_TIME_S 
     # toggle to pause handler
-    play_pause.when_pressed = def_pause
+    # play_pause.when_pressed = def_pause
 #end def_play
 
 # function to kill a VLC processes
@@ -183,27 +184,27 @@ nc = None
 thread_end_requested = False
 
 # define GPIO Button and their behaviour
-led = LED(15)
-shut = Button(3, hold_time=2)
-next = Button(17, bounce_time=0.050)
-prev = Button(27, bounce_time=0.050)
-play_pause = Button(26)
-shut.when_held    = def_shutdown
-next.when_pressed = def_next
-prev.when_pressed = def_prev
-play_pause.when_pressed = def_play
+#led = LED(15)
+#shut = Button(3, hold_time=2)
+#next = Button(17, bounce_time=0.050)
+#prev = Button(27, bounce_time=0.050)
+#play_pause = Button(26)
+#shut.when_held    = def_shutdown
+#next.when_pressed = def_next
+#prev.when_pressed = def_prev
+#play_pause.when_pressed = def_play
 
-# Create the KY040 Interface and start it
-ky040 = KY040(23, 22, 21, def_vol, def_vol0)
-ky040.start()
+# Create a KY040 and start it
+# ky040 = KY040(22, 23, 21, def_vol, def_vol0)
+# ky040.start()
 
 # Shutdown tracking globals
 playing = False # default startup, nothing is playing
 playing_old = False
 shutdown_timer = DEFAULT_SHUTDOWN_TIME_S
 
-# Switch on Relais to show that we can start
-led.on()
+# Switch on Relais
+# led.on()
 
 
 def status_query():
@@ -234,19 +235,19 @@ def card_reader_input():
    global nc
    global thread_end_requested
    # Setup reader object
-   reader = Reader()
+   # reader = Reader()
 
    # get absolute path of this script
    dir_path = os.path.dirname(os.path.realpath(__file__))
    
    # Check if device found
-   if reader.dev != None:
+   if 1:  # if reader.dev != None:
       
       # Lets start the daemon and wait for RFID as long as NetCat is connect
       # Else in the main loop the reconnect to VLC if possible
       while (thread_end_requested == False):
          # reading the card id - blocking call
-         cardid = reader.readCard()
+         cardid = int(input("ID: "))  # cardid = reader.readCard()
          logging.info("Card ID %d was used.", cardid)
 
          if (nc == None):
@@ -254,6 +255,26 @@ def card_reader_input():
             continue
          #end if
          
+         ## Debug Input Start
+         if (cardid < 10):
+            if cardid == 1:
+               def_play()
+            elif cardid == 2:
+               def_pause()
+            elif cardid == 3:
+               def_prev()
+            elif cardid == 4:
+               def_next()
+            elif cardid == 5:
+               def_vol(KY040.CLOCKWISE)
+            elif cardid == 6:
+               def_vol(KY040.ANTICLOCKWISE)
+            elif cardid == 7:
+               def_shutdown()
+            # wait for next input
+            continue
+         #end if cardid
+         ## Debug Input End
          
          # clear playlist
          clear_playlist()
@@ -297,15 +318,15 @@ def card_reader_input():
          # endif
 
       # end while
-   else:
-     if reader.deviceName :
-        logging.error('Could not find the device %s\n. Make sure is connected' % deviceName)
-     else:
-        # file is created by using script RegisterDevice.py
-        logging.error("No Device configured. Execute RegisterDevice.py")
+   # else:
+   #   if reader.deviceName :
+   #      logging.error('Could not find the device %s\n. Make sure is connected' % deviceName)
+   #   else:
+   #      # file is created by using script RegisterDevice.py
+   #      logging.error("No Device configured. Execute RegisterDevice.py")
 #end def card_reader_input
 
-# Debug code - start thread for user input
+# Start thread for user input
 start_new_thread(card_reader_input,())
 # Thread to query the VLC Status
 start_new_thread(status_query,())
@@ -338,4 +359,3 @@ while (shutdown_timer > 0) :
 #end while
 # Timeout reached, shutdown system
 def_shutdown()
-
