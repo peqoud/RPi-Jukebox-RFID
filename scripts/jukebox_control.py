@@ -1,9 +1,11 @@
 #!/usr/bin/python
 # Currently only work in python 2.7 - .send works with str here
 
+
 # Pages https://forum-raspberrypi.de/forum/thread/13144-projekt-jukebox4kids-jukebox-fuer-kinder/?postID=312257#post312257
 # needs: https://nclib.readthedocs.io/en/latest/
 # pip install nclib
+
 # Depends on libs:
 # nclib    - https://nclib.readthedocs.io/en/latest/  - pip install nclib
 # gpiozero - https://gpiozero.readthedocs.io/en/stable/installing.html
@@ -28,7 +30,6 @@ from thread import start_new_thread
 # Regex for VLC
 import re
 import KY040.ky040.KY040 import KY040
-
 
 # setup Basic logging to file
 logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%I:%M:%S', level=logging.DEBUG, filename='./jukebox_control.log', filemode='w')
@@ -61,7 +62,6 @@ def nc_send(command, recv=False):
         # delete nc
         nc = None
 
-
 # Handler if the process is killed (by OS during shutdown most probably)
 def sigterm_handler(signal, frame):
    global thread_end_requested
@@ -76,12 +76,10 @@ def sigterm_handler(signal, frame):
    # Kill vlc subprocess
    check_kill_process("vlc")
    logging.info("Exit Daemon RFID and VLC Killed")
-   
    # Switch of relais
    led.off()
    # Wait 1 seconds
    time.sleep(1)
-   
    logging.info("Exit Task")
    logging.shutdown()
    # Exit Task

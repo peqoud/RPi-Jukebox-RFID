@@ -18,7 +18,7 @@
 # from gpiozero import Button
 # from gpiozero import LED
 import subprocess
-import os , signal
+import os, signal
 from subprocess import check_call
 import signal
 import time
@@ -32,7 +32,8 @@ import re
 # from KY040 import KY040
 
 # setup Basic logging to file
-logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%I:%M:%S', level=logging.DEBUG, filename='./jukebox_control.log', filemode='w')  # change filemode to 'a' for an continues logfile
+logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%I:%M:%S', level=logging.DEBUG,
+                    filename='./jukebox_control.log', filemode='w')  # change filemode to 'a' for an continues logfile
 # Logging for console
 console = logging.StreamHandler()
 console.setLevel(logging.DEBUG)
@@ -247,8 +248,8 @@ def card_reader_input():
       # Else in the main loop the reconnect to VLC if possible
       while (thread_end_requested == False):
          # reading the card id - blocking call
-         cardid = int(input("ID: "))  # cardid = reader.readCard()
-         logging.info("Card ID %d was used.", cardid)
+         cardid = int(input())  # cardid = reader.readCard()
+         logging.info("Card ID %d.", cardid)
 
          if (nc == None):
             # dont process command and go back to user input, as NC is not there
@@ -359,3 +360,4 @@ while (shutdown_timer > 0) :
 #end while
 # Timeout reached, shutdown system
 def_shutdown()
+
