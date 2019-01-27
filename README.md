@@ -65,7 +65,7 @@ There is a growing section of [troubleshooting](docs/MANUAL.md#faq) including:
 
 * How do I get the jukebox into a new WiFi network?
 * The `amixer` command requires different device name, not `PCM`
-* Script `daemon_rfid_reader.py` only works via SSH not by RFID cards
+
 * Script daemon is closing down unexpectedly
 
 ## Acknowledgments

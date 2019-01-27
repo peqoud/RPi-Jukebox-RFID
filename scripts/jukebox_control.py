@@ -29,10 +29,12 @@ import nclib
 from thread import start_new_thread
 # Regex for VLC
 import re
-import KY040.ky040.KY040 import KY040
+
+from KY040 import KY040
 
 # setup Basic logging to file
-logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%I:%M:%S', level=logging.DEBUG, filename='./jukebox_control.log', filemode='w')
+logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%I:%M:%S', level=logging.DEBUG,
+                    filename='./jukebox_control.log', filemode='w')  # change filemode to 'a' for an continues logfile
 # Logging for console
 console = logging.StreamHandler()
 console.setLevel(logging.DEBUG)
@@ -62,8 +64,8 @@ def nc_send(command, recv=False):
         # delete nc
         nc = None
 
-# Handler if the process is killed (by OS during shutdown most probably)
-def sigterm_handler(signal, frame):
+
+def end_jukebox():
    global thread_end_requested
    thread_end_requested = True
    logging.info("Jukebox Stopped")
@@ -80,33 +82,37 @@ def sigterm_handler(signal, frame):
    led.off()
    # Wait 1 seconds
    time.sleep(1)
-   logging.info("Exit Task")
    logging.shutdown()
+# end def sigterm_handler
+
+# Handler if the process is killed (by OS during shutdown most probably)
+def sigterm_handler(signal, frame):
+   """ Signal TERM received - just exist the Task """
+   end_jukebox()
    # Exit Task
    sys.exit(0)
 # end def sigterm_handler
 
 def def_shutdown():
-   global thread_end_requested
-   thread_end_requested = True
-   logging.info("Switch Off Relais")
-   # Switch of relais
-   led.off()
-   nc_send('stop')
-   nc.close()  
+   """ Shutdown the Computer """
+   end_jukebox()
    # Wait 1 seconds
    time.sleep(1)
    logging.info("Calling PowerOff")
    logging.shutdown()
    check_call(['sudo', 'poweroff'])
-    
+# end def sigterm_handler
+
 def clear_playlist():
+   """ Clear the current VLC playlist - stops play """
    nc_send('clear')
    logging.info("Playlist Cleared")
+# end def clear_playlist
    
 def add_to_playlist(playlist):
    nc_send('add ' + playlist)
    logging.info("Loaded new playlist")
+# end def add_to_playlist
 
 def def_vol(direction):
     if (direction == KY040.CLOCKWISE):
@@ -118,19 +124,29 @@ def def_vol(direction):
 #end def
 
 def def_vol0():
+    vol_sound.play()
     check_call("amixer sset PCM toggle", shell=True)
+    
     logging.info("Mute/Unmute")
+#end def_vol0
 
 def def_next():
+    next_sound.play()
+    time.sleep(0.3)
     nc_send('next')
     logging.info("Next Titel")
+#end def_next
 
 def def_prev():
+    prev_sound.play()
+    time.sleep(0.3)
     nc_send('prev')
     logging.info("Prev Titel")
 
 def def_pause():
     global playing, play_pause
+    pause_sound.play()
+    time.sleep(0.3)
     nc_send('pause')
     logging.info("Pause Play")
     # button pressed - set timeout-value
@@ -142,6 +158,8 @@ def def_pause():
 
 def def_play():
     global playing, play_pause
+    play_sound.play()
+    time.sleep(0.3)
     nc_send('play')
     logging.info("Start Playing")
     # button pressed
@@ -166,13 +184,22 @@ def check_kill_process(pstring):
 signal.signal(signal.SIGTERM, sigterm_handler)
 signal.signal(signal.SIGINT, sigterm_handler)
 
+# Init Button sound
+pygame.init()
+pygame.mixer.init()
+play_sound = pygame.mixer.Sound("../misc/button-20.wav")
+pause_sound = pygame.mixer.Sound("../misc/button-30.wav")
+next_sound = pygame.mixer.Sound("../misc/button-42.wav")
+prev_sound = pygame.mixer.Sound("../misc/button-20.wav")
+vol_sound = pygame.mixer.Sound("../misc/switch-7.wav")
 
 # Start VLC in subprocess
-command = "cvlc -A alsa,none --alsa-audio-device default -I rc --rc-host localhost:4212"
-logging.info("Command: %s", command)
+#command = "cvlc -A alsa,none --alsa-audio-device default -I rc --rc-host localhost:4212"
+command = "vlc -I rc --rc-host localhost:4212 ../misc/startupsound.mp3"
+logging.info("Start VLC: %s", command)
 # set VLC to new playlist
 pid = subprocess.Popen(command, shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
-logging.info("Started process: %d", pid.pid)
+logging.info("VLC Started in Process: %d", pid.pid)
 
 
 # Global variable for NetCat communication
