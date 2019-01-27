@@ -1,6 +1,6 @@
 [Unit]  
 Description=Startup Sound
-After=network.target iptables.service firewalld.service rfid-reader.service
+After=network.target iptables.service firewalld.service jukebox.service
 
 [Service]
 WorkingDirectory=/home/pi/RPi-Jukebox-RFID
